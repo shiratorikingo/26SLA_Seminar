@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cornell Notes Link for 26SLA Seminar (Secured & 5-Pages)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f8fafc;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', 'Noto Sans JP', serif;
+        }
+        /* 暗記目隠しモードのエフェクト */
+        .recall-blurred {
+            filter: blur(10px);
+            background-color: rgba(241, 245, 249, 0.95);
+            user-select: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .recall-blurred:hover {
+            background-color: rgba(219, 234, 254, 0.7);
+            filter: blur(4px);
+        }
+        .recall-revealed {
+            filter: none !important;
+            background-color: transparent !important;
+            cursor: default;
+        }
+        .heatmap-cell {
+            transition: transform 0.2s, cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .heatmap-cell:hover {
+            transform: scale(1.25);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <div id="lockScreen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full rounded-3xl shadow-2xl p-8 border border-slate-100 text-center relative overflow-hidden">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-50 rounded-full blur-2xl opacity-60"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-amber-50 rounded-full blur-2xl opacity-60"></div>
+
+            <div class="relative z-10 space-y-6">
+                <div class="w-24 h-24 bg-gradient-to-tr from-sky-50 to-blue-50 border border-blue-100 rounded-full flex items-center justify-center mx-auto shadow-sm">
+                    <svg class="w-16 h-16 text-blue-600" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M25 75C25 75 35 80 50 80C65 80 80 70 85 55C90 40 82 25 75 25C68 25 65 32 65 40C65 48 58 55 50 55C42 55 35 62 30 68C25 74 25 75 25 75Z" fill="currentColor"/>
+                        <path d="M75 25C78 21 84 18 88 21C92 24 88 31 82 31C76 31 75 25 75 25Z" fill="#f59e0b"/>
+                        <circle cx="73" cy="28" r="2.5" fill="#0f172a"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <h1 class="serif-title text-2xl font-black text-slate-900 tracking-tight leading-snug">
+                        Cornell Notes Link<br>
+                        <span class="text-blue-600 text-lg">for 26SLA Seminar</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 mt-2">セミナー受講生・指導者向け学習管理プラットフォーム</p>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-left text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">アクセス認証コード</label>
+                    <input type="password" id="pwInput" placeholder="合言葉キーを入力してください" 
+                           class="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white text-center text-lg font-mono tracking-widest py-3.5 px-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all">
+                    <p id="pwError" class="text-xs text-rose-500 font-semibold hidden flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> キーコードが異なります。再度ご確認ください。
+                    </p>
+                </div>
+
+                <button onclick="handleAccessSubmit()" class="w-full bg-slate-900 hover:bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-slate-900/10 hover:shadow-blue-600/10 transition-all transform active:scale-[0.98]">
+                    プラットフォームを開く
+                </button>
+                
+                <p class="text-[10px] text-slate-400">※学生用合言葉: <code class="bg-slate-100 px-1 py-0.5 rounded text-blue-600 font-mono">swan</code></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="appContainer" class="hidden flex-grow flex flex-col justify-between">
+        
+        <header class="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-tr from-sky-50 to-blue-50 border border-blue-100 rounded-xl flex items-center justify-center text-blue-600 shadow-sm">
+                        <svg class="w-8 h-8" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M25 75C25 75 35 80 50 80C65 80 80 70 85 55C90 40 82 25 75 25C68 25 65 32 65 40C65 48 58 55 50 55C42 55 35 62 30 68C25 74 25 75 25 75Z" fill="currentColor"/>
+                            <path d="M75 25C78 21 84 18 88 21C92 24 88 31 82 31C76 31 75 25 75 25Z" fill="#f59e0b"/>
+                            <circle cx="73" cy="28" r="2.5" fill="#0f172a"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="serif-title text-base font-black text-slate-900 leading-tight">Cornell Notes Link</h1>
+                        <p class="text-[10px] text-blue-600 font-bold tracking-wider uppercase">for 26SLA Seminar</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200/50">
+                    <button id="tabStudent" onclick="switchToStudentView()" class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 bg-white text-slate-900 shadow-sm">
+                        <i class="fa-solid fa-pen-nib text-blue-500"></i>
+                        学習者エディタ
+                    </button>
+                    <button id="tabTeacher" onclick="trySwitchToTeacherView()" class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 text-slate-500 hover:text-slate-900">
+                        <i class="fa-solid fa-chart-line text-slate-400"></i>
+                        指導者ダッシュボード
+                        <span id="badgeCount" class="bg-blue-600 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-1">0</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+            
+            <div id="studentView" class="space-y-6">
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 grid grid-cols-1 md:grid-cols-4 gap-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-slate-50 to-transparent rounded-full pointer-events-none"></div>
+                    <div>
+                        <label class="block text-[10px] font-black tracking-wider text-slate-400 uppercase mb-2">① 講義テーマ / トピック名</label>
+                        <input type="text" id="topicInput" oninput="saveDraft()" placeholder="例: 英語学習の科学" 
+                               class="w-full text-base font-bold text-slate-950 border-b-2 border-slate-100 focus:border-blue-500 focus:outline-none pb-1.5 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black tracking-wider text-slate-400 uppercase mb-2">② 学籍番号 (半角英数)</label>
+                        <input type="text" id="studentIdInput" oninput="handleStudentIdInput(); saveDraft();" placeholder="例: 26SLA-042" 
+                               class="w-full text-base font-medium text-slate-700 border-b-2 border-slate-100 focus:border-blue-500 focus:outline-none pb-1.5 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black tracking-wider text-slate-400 uppercase mb-2">③ 氏名 (フルネーム・スペースなし)</label>
+                        <input type="text" id="studentNameInput" oninput="saveDraft()" placeholder="例: 北星太郎" 
+                               class="w-full text-base font-medium text-slate-700 border-b-2 border-slate-100 focus:border-blue-500 focus:outline-none pb-1.5 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black tracking-wider text-slate-400 uppercase mb-2">④ 日付 (システム自動設定)</label>
+                        <div class="flex items-center gap-2 text-slate-800 font-bold border-b-2 border-slate-100 pb-1.5">
+                            <i class="fa-solid fa-calendar-day text-blue-500"></i>
+                            <span id="autoDateLabel">取得中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold text-slate-400 uppercase">エディタページ:</span>
+                        <div class="inline-flex rounded-lg p-1 bg-slate-100 border border-slate-200/50 flex-wrap gap-1">
+                            <button onclick="switchEditorPage(0)" id="btnPage0" class="px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-900 shadow-sm transition-all">1P</button>
+                            <button onclick="switchEditorPage(1)" id="btnPage1" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-900 transition-all">2P</button>
+                            <button onclick="switchEditorPage(2)" id="btnPage2" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-900 transition-all">3P</button>
+                            <button onclick="switchEditorPage(3)" id="btnPage3" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-900 transition-all">4P</button>
+                            <button onclick="switchEditorPage(4)" id="btnPage4" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-900 transition-all">5P</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span id="totalCharCountLabel" class="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                            全ページ総文字数: 0字
+                        </span>
+                        <div id="pageBadge" class="bg-blue-50 text-blue-600 text-xs font-extrabold px-3 py-1.5 rounded-xl border border-blue-100">
+                            1 / 5 ページ目を編集中
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <div class="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200/60 flex-grow max-w-xl">
+                        <span class="text-xs font-black text-slate-500 uppercase shrink-0">
+                            <i class="fa-solid fa-paperclip text-blue-500 mr-1"></i> 資料の添付:
+                        </span>
+                        <input type="file" id="attachmentInput" onchange="handleFileSelected()" class="text-xs text-slate-600 file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer w-full">
+                        <div id="fileInfoLabel" class="text-[10px] text-slate-400 font-mono hidden shrink-0"></div>
+                    </div>
+                    
+                    <div class="flex items-center justify-end gap-3 shrink-0 flex-wrap">
+                        <button onclick="toggleActiveRecall()" id="recallToggleBtn" class="flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition-all">
+                            <i class="fa-solid fa-eye-slash"></i>
+                            <span>暗記目隠し: OFF</span>
+                        </button>
+                        <span id="draftStatus" class="text-[11px] text-emerald-600 font-medium hidden">
+                            <i class="fa-solid fa-cloud-inverse animate-pulse"></i> 下書き保存済
+                        </span>
+                        <button onclick="clearEditor()" class="text-xs text-slate-500 hover:text-rose-600 font-bold px-2 py-2 rounded-lg transition-colors">
+                            クリア
+                        </button>
+                        <button onclick="handleNoteSubmit()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-blue-600/15 hover:shadow-blue-600/30 transition-all transform active:scale-95">
+                            <i class="fa-solid fa-paper-plane mr-1.5"></i>ノート(5P分)を提出
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[32px] shadow-sm border border-slate-200/80 overflow-hidden flex flex-col min-h-[600px] transition-all">
+                    <div class="flex flex-1 flex-col md:flex-row border-b-2 border-slate-200 min-h-[450px]">
+                        
+                        <div class="w-full md:w-[28%] bg-slate-50/50 p-6 border-b-2 md:border-b-0 md:border-r-2 border-slate-200 flex flex-col justify-between relative">
+                            <div class="space-y-4 h-full flex flex-col">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <span class="text-xs font-black tracking-wider text-slate-400 uppercase flex items-center gap-2">
+                                        <i class="fa-solid fa-key text-blue-500"></i>
+                                        1. キーキーワード / 質問
+                                    </span>
+                                </div>
+                                <div class="relative flex-1 flex flex-col">
+                                    <div id="recallOverlay" class="absolute inset-0 rounded-2xl hidden z-20 transition-all"></div>
+                                    <textarea id="cuesArea" oninput="saveDraft()" placeholder="・重要な用語や定義&#10;・講義中の疑問や問いかけ&#10;&#10;（5ページそれぞれ異なるメモを入力可能です）" 
+                                              class="w-full h-[320px] bg-transparent resize-none border-0 text-sm leading-relaxed text-slate-900 focus:outline-none focus:ring-0 placeholder-slate-400 font-medium z-10"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full md:w-[72%] p-6 flex flex-col justify-between bg-white">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                    <span class="text-xs font-black tracking-wider text-slate-400 uppercase flex items-center gap-2">
+                                        <i class="fa-solid fa-list-ul text-amber-500"></i>
+                                        2. 講義ノート詳細
+                                    </span>
+                                    <span id="charCountLabel" class="text-[10px] text-slate-400 font-mono">文字数: 0字</span>
+                                </div>
+                                <textarea id="bodyArea" oninput="updateCharCount(); saveDraft();" placeholder="授業内容、板書、重要スライドの要点をここに書き留めます。&#10;&#10;（現在のページが埋まったら上のタブ(1P〜5P)で切り替えてください）" 
+                                          class="w-full h-[320px] bg-transparent resize-none border-0 text-sm leading-loose text-slate-800 focus:outline-none focus:ring-0 placeholder-slate-400" style="background-image: linear-gradient(#f1f5f9 1px, transparent 1px); bg-local; background-size: 100% 2.2rem; line-height: 2.2rem;"></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="p-6 bg-slate-50/70">
+                        <div class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-3">
+                            <span class="text-xs font-black tracking-wider text-slate-400 uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles text-violet-500"></i>
+                                3. 本文のまとめ / 要約 (全ページ共通・講義全体の総括)
+                            </span>
+                        </div>
+                        <textarea id="summaryArea" oninput="saveDraft()" placeholder="講義全体の最重要ポイントを総合して要約を記述します。" 
+                                  class="w-full h-20 bg-transparent resize-none border-0 text-sm leading-relaxed text-slate-800 focus:outline-none focus:ring-0 placeholder-slate-400 font-medium"></textarea>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-md">
+                                <i class="fa-solid fa-id-card-clip"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-black text-slate-900">マイ・学習ポートフォリオ</h3>
+                                <p class="text-[10px] text-slate-400">学籍番号に基づいたこれまでの提出履歴・蓄積データです。</p>
+                            </div>
+                        </div>
+                        <div id="studentPortfolioBadge" class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-lg">
+                            履歴: 未検索
+                        </div>
+                    </div>
+
+                    <div id="portfolioPlaceholder" class="text-center py-10 text-slate-400 space-y-2">
+                        <i class="fa-solid fa-magnifying-glass text-3xl text-slate-200"></i>
+                        <p class="text-xs font-semibold">上の学籍番号欄に入力すると、自動で提出履歴ポートフォリオが展開されます。</p>
+                    </div>
+
+                    <div id="portfolioContent" class="hidden space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <span class="block text-[9px] text-slate-400 font-bold uppercase">通算提出回数</span>
+                                <span id="portfolioCount" class="text-2xl font-black text-slate-900">0回</span>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <span class="block text-[9px] text-slate-400 font-bold uppercase">合計学習文字数</span>
+                                <span id="portfolioChars" class="text-2xl font-black text-slate-900">0字</span>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <span class="block text-[9px] text-slate-400 font-bold uppercase">最終提出時間</span>
+                                <span id="portfolioLastDate" class="text-xs font-bold text-slate-900 block mt-1.5">-</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider">提出済みノート履歴一覧</h4>
+                            <div id="portfolioCardList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="teacherView" class="hidden space-y-8">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute -top-6 -right-6 w-20 h-20 bg-blue-50 rounded-full blur-xl"></div>
+                        <div class="flex justify-between items-center mb-4 relative z-10">
+                            <h4 class="text-[10px] font-black tracking-wider text-slate-400 uppercase">総ノート提出数</h4>
+                            <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm"><i class="fa-solid fa-envelope-open-text"></i></div>
+                        </div>
+                        <div class="flex items-baseline gap-2 relative z-10">
+                            <span id="statTotalCount" class="text-4xl font-extrabold text-slate-900">0</span>
+                            <span class="text-xs text-slate-400">ファイル</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute -top-6 -right-6 w-20 h-20 bg-emerald-50 rounded-full blur-xl"></div>
+                        <div class="flex justify-between items-center mb-4 relative z-10">
+                            <h4 class="text-[10px] font-black tracking-wider text-slate-400 uppercase">ユニーク受講生数</h4>
+                            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                        <div class="flex items-baseline gap-2 relative z-10">
+                            <span id="statUniqueUsers" class="text-4xl font-extrabold text-slate-900">0</span>
+                            <span class="text-xs text-slate-400">名</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute -top-6 -right-6 w-20 h-20 bg-violet-50 rounded-full blur-xl"></div>
+                        <div class="flex justify-between items-center mb-4 relative z-10">
+                            <h4 class="text-[10px] font-black tracking-wider text-slate-400 uppercase">平均ノートボリューム</h4>
+                            <div class="w-8 h-8 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center text-sm"><i class="fa-solid fa-file-signature"></i></div>
+                        </div>
+                        <div class="flex items-baseline gap-2 relative z-10">
+                            <span id="statAvgChars" class="text-4xl font-extrabold text-slate-900">0</span>
+                            <span class="text-xs text-slate-400">文字 / 件</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm space-y-4">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-slate-900">クラス提出ヒートマップ (過去30日間)</h3>
+                        <p class="text-xs text-slate-400">提出頻度を可視化したものです（色が濃いほど提出件数が多い）。</p>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200/50">
+                        <div id="heatmapGrid" class="flex flex-wrap gap-2 flex-grow"></div>
+                        <div class="text-right shrink-0">
+                            <div class="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold mb-1">
+                                <span>提出少</span>
+                                <span class="w-3.5 h-3.5 bg-slate-200 rounded"></span>
+                                <span class="w-3.5 h-3.5 bg-emerald-200 rounded"></span>
+                                <span class="w-3.5 h-3.5 bg-emerald-400 rounded"></span>
+                                <span class="w-3.5 h-3.5 bg-emerald-600 rounded"></span>
+                                <span>提出多</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="space-y-1 text-center md:text-left">
+                        <h3 class="text-sm font-extrabold text-slate-900">提出ログの一括書き出し (5ページ対応版)</h3>
+                        <p class="text-xs text-slate-400">蓄積された講義データや添付ファイル名をCSV/JSONとして出力可能です。</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-3 rounded-xl transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-file-csv"></i> Excel対応 CSV出力
+                        </button>
+                        <button onclick="exportToJSON()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-5 py-3 rounded-xl transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-file-code"></i> JSONデータ出力
+                        </button>
+                        <button onclick="triggerResetDatabase()" class="border border-rose-200 text-rose-600 hover:bg-rose-50 font-bold text-xs px-4 py-3 rounded-xl transition-all">
+                            システム初期化
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-slate-900">セミナー受講生提出 data 台帳</h3>
+                            <p class="text-xs text-slate-400">提出があった講義メモ・添付資料の有無をリアルタイムに確認します。</p>
+                        </div>
+                        <div class="w-full sm:w-80 relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-xs">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input type="text" id="searchBar" oninput="renderNotesTable()" placeholder="氏名、学籍番号、講義テーマで絞り込み..." 
+                                   class="w-full text-xs pl-9 pr-4 py-2.5 bg-white border border-slate-200 focus:border-blue-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all">
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-wider bg-slate-50/30">
+                                    <th class="p-4 pl-6">提出日時</th>
+                                    <th class="p-4">学籍番号</th>
+                                    <th class="p-4">氏名</th>
+                                    <th class="p-4">講義テーマ / トピック</th>
+                                    <th class="p-4 text-center">添付資料</th>
+                                    <th class="p-4 text-center">本文総数</th>
+                                    <th class="p-4 text-right pr-6">ノートプレビュー</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody" class="text-xs text-slate-700 divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <footer class="bg-white border-t border-slate-100 py-6 px-6 mt-12">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-400">
+                <p class="flex items-center gap-2">
+                    <span class="text-slate-900 font-bold">Cornell Notes Link for 26SLA Seminar</span>
+                    <span>|</span>
+                    <span>© 2026 SLA Management Platform</span>
+                </p>
+                <p class="flex items-center gap-4 font-semibold">
+                    <span class="flex items-center gap-1.5 text-blue-600"><i class="fa-solid fa-circle-check text-[8px]"></i> 5P・資料添付・高セキュリティ版</span>
+                </p>
+            </div>
+        </footer>
+
+    </div>
+
+    <div id="teacherUnlockModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 text-center space-y-4">
+            <div class="w-12 h-12 bg-amber-50 text-amber-500 border border-amber-100 rounded-2xl flex items-center justify-center text-lg mx-auto">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-slate-900">指導者ダッシュボードの解除</h3>
+                <p class="text-xs text-slate-400 mt-1">管理用のセキュリティキーを入力してください。</p>
+            </div>
+            <input type="password" id="teacherUnlockPw" placeholder="パスワードを入力" 
+                   class="w-full text-center text-sm font-mono bg-slate-50 border border-slate-200 py-2.5 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeTeacherUnlockModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-xs transition-colors">
+                    キャンセル
+                </button>
+                <button onclick="verifyTeacherUnlock()" class="flex-1 py-2.5 bg-slate-900 hover:bg-blue-600 text-white font-bold rounded-xl text-xs shadow-lg shadow-slate-900/10 transition-colors">
+                    認証する
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="noteViewerModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-[32px] max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-100">
+            <div class="bg-slate-50 border-b border-slate-100 p-6 flex justify-between items-start">
+                <div>
+                    <span class="text-[9px] bg-blue-100 text-blue-700 font-black tracking-wider uppercase px-2.5 py-1 rounded-md">26SLA SEMINAR SUBMISSION VIEW</span>
+                    <h3 id="viewModalTopic" class="text-lg font-black text-slate-900 mt-2">講義テーマ名</h3>
+                    <p id="viewModalMeta" class="text-xs text-slate-400 mt-1">学籍番号: XXX | 氏名: XXX | 提出日: XXX</p>
+                    <div id="viewModalAttachmentRow" class="text-xs text-blue-600 font-bold mt-2 hidden flex items-center gap-1">
+                        <i class="fa-solid fa-paperclip"></i> 添付資料: <span id="viewModalAttachmentName" class="underline">なし</span>
+                    </div>
+                </div>
+                <button onclick="closeNoteViewerModal()" class="w-8 h-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="bg-white border-b border-slate-100 px-6 py-3 flex gap-1.5 flex-wrap">
+                <button onclick="switchViewerModalPage(0)" id="modalPageTab0" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-900 text-white shadow-sm">1P</button>
+                <button onclick="switchViewerModalPage(1)" id="modalPageTab1" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-900">2P</button>
+                <button onclick="switchViewerModalPage(2)" id="modalPageTab2" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-900">3P</button>
+                <button onclick="switchViewerModalPage(3)" id="modalPageTab3" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-900">4P</button>
+                <button onclick="switchViewerModalPage(4)" id="modalPageTab4" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-900">5P</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4 flex-grow bg-slate-50/30">
+                <div class="grid grid-cols-1 md:grid-cols-12 rounded-2xl border border-slate-200 overflow-hidden bg-white min-h-[300px]">
+                    <div class="md:col-span-4 bg-slate-50/50 p-5 border-b md:border-b-0 md:border-r border-slate-200">
+                        <h4 class="text-xs font-black tracking-wider text-slate-400 uppercase mb-3"><i class="fa-solid fa-key text-blue-500 mr-1.5"></i> 1. キーワード / 質問</h4>
+                        <p id="viewModalCues" class="text-xs text-slate-800 whitespace-pre-wrap leading-relaxed font-semibold"></p>
+                    </div>
+                    <div class="md:col-span-8 p-5">
+                        <h4 class="text-xs font-black tracking-wider text-slate-400 uppercase mb-3"><i class="fa-solid fa-list-ul text-amber-500 mr-1.5"></i> 2. 講義ノート本文</h4>
+                        <p id="viewModalBody" class="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <div class="p-5 bg-white rounded-2xl border border-slate-200">
+                    <h4 class="text-xs font-black tracking-wider text-slate-400 uppercase mb-2"><i class="fa-solid fa-wand-magic-sparkles text-violet-500 mr-1.5"></i> 3. 全体要約 / まとめ</h4>
+                    <p id="viewModalSummary" class="text-xs text-slate-800 whitespace-pre-wrap leading-relaxed font-semibold italic"></p>
+                </div>
+            </div>
+            
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <button onclick="closeNoteViewerModal()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all">
+                    ビューアを閉じる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-slate-900/95 text-white border border-slate-800 px-5 py-3.5 rounded-2xl shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-blue-500"></i>
+        <span id="toastMsg" class="text-xs font-bold">メッセージ</span>
+    </div>
+
+    <script>
+        // セキュリティ構成
+        const SECURITY_CONFIG = {
+            studentCode: "swan", 
+            teacherHash: "e59deec4856b3e69188e7b9fb5ff3a970e70be3153ee6149fbf7f4ef289873ee" // pta272589
+        };
+
+        let notesDatabase = [];
+        let isTeacherAuthenticated = false;
+        let isRecallModeActive = false;
+
+        let activePageIdx = 0;
+        let pagesData = [
+            { cues: "", body: "" }, { cues: "", body: "" }, { cues: "", body: "" }, { cues: "", body: "" }, { cues: "", body: "" }
+        ];
+        let globalSummary = ""; 
+        let currentAttachedFileData = null; 
+
+        let modalActivePageIdx = 0;
+        let selectedNoteForModal = null;
+        let draftTimer = null;
+
+        // SHA-256 ハッシュ化
+        async function computeHash(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const buffer = await crypto.subtle.digest('SHA-256', data);
+            const byteArray = Array.from(new Uint8Array(buffer));
+            return byteArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        const sampleNotes = [
+            {
+                id: "sample-1",
+                timestamp: "2026/05/19 10:15:33",
+                dateStr: "2026/05/19",
+                topic: "英語学習の科学（導入編）",
+                studentId: "26SLA-001",
+                studentName: "佐藤健一",
+                attachment: { name: "syllabus_memo.pdf", size: "142 KB" },
+                summary: "インプットの重要性と、アウトプットを組み合わせるインターリービング学習法の認知科学的有効性についての総括。",
+                pages: [
+                    { cues: "インプット仮説とは？", body: "■ 1. クラッシェンのインプット仮説\n理解可能なインプット(i+1)が言語習得を促す最も本質的な要素である。" },
+                    { cues: "アウトプットの役割は？", body: "■ 2. メリザ・スウェインの気づき仮説\n話そうとすることで、自分が何を知らないかに気づき、言語構造の正確な処理が始まる。" },
+                    { cues: "", body: "" }, { cues: "", body: "" }, { cues: "", body: "" }
+                ]
+            }
+        ];
+
+        window.onload = function() {
+            const today = new Date();
+            document.getElementById('autoDateLabel').innerText = `${today.getFullYear()}年${String(today.getMonth() + 1).padStart(2, '0')}月${String(today.getDate()).padStart(2, '0')}日`;
+
+            const stored = localStorage.getItem('cornell_notes_db_26sla_v5');
+            if (stored) {
+                try { notesDatabase = JSON.parse(stored); } catch(e) { notesDatabase = sampleNotes; }
+            } else {
+                notesDatabase = sampleNotes;
+                localStorage.setItem('cornell_notes_db_26sla_v5', JSON.stringify(notesDatabase));
+            }
+
+            loadDraft();
+            updateTeacherBadge();
+            updateTotalCharCount();
+            
+            document.getElementById('pwInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') handleAccessSubmit(); });
+            document.getElementById('teacherUnlockPw').addEventListener('keydown', function(e) { if (e.key === 'Enter') verifyTeacherUnlock(); });
+
+            handleStudentIdInput();
+        };
+
+        // ロック画面の認証ハンドラーを徹底修正
+        async function handleAccessSubmit() {
+            const valInput = document.getElementById('pwInput').value.trim();
+            const errorLabel = document.getElementById('pwError');
+            
+            if (!valInput) return;
+
+            // 入力された文字のハッシュを計算
+            const inputHash = await computeHash(valInput);
+
+            // 1. まず学生用の合言葉「swan」をチェック（大文字小文字を区別せず検証）
+            if (valInput.toLowerCase() === SECURITY_CONFIG.studentCode) {
+                errorLabel.classList.add('hidden');
+                document.getElementById('lockScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                switchToStudentView();
+                showToast("🔐 学生ログイン認証に成功しました。", "success");
+                document.getElementById('pwInput').value = ""; // 通過後にクリア
+                return;
+            } 
+            
+            // 2. 次に教師用パスワードをチェック
+            if (inputHash === SECURITY_CONFIG.teacherHash) {
+                errorLabel.classList.add('hidden');
+                isTeacherAuthenticated = true;
+                document.getElementById('lockScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                switchToTeacherView();
+                showToast("🔑 指導者ログイン認証に成功しました。", "success");
+                document.getElementById('pwInput').value = ""; // 通過後にクリア
+                return;
+            }
+
+            // 3. どちらにも合致しない場合はエラー
+            errorLabel.classList.remove('hidden');
+            document.getElementById('pwInput').value = "";
+            document.getElementById('pwInput').focus();
+        }
+
+        function switchToStudentView() {
+            document.getElementById('studentView').classList.remove('hidden');
+            document.getElementById('teacherView').classList.add('hidden');
+            document.getElementById('tabStudent').className = "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 bg-white text-slate-900 shadow-sm";
+            document.getElementById('tabTeacher').className = "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 text-slate-500 hover:text-slate-900";
+            handleStudentIdInput();
+        }
+
+        function trySwitchToTeacherView() {
+            if (isTeacherAuthenticated) {
+                switchToTeacherView();
+            } else {
+                document.getElementById('teacherUnlockPw').value = "";
+                document.getElementById('teacherUnlockModal').classList.remove('hidden');
+                document.getElementById('teacherUnlockPw').focus();
+            }
+        }
+
+        async function verifyTeacherUnlock() {
+            const pwVal = document.getElementById('teacherUnlockPw').value.trim();
+            const inputHash = await computeHash(pwVal);
+
+            if (inputHash === SECURITY_CONFIG.teacherHash) {
+                isTeacherAuthenticated = true;
+                closeTeacherUnlockModal();
+                switchToTeacherView();
+                showToast("指導者ダッシュボードのプロテクトを解除しました。", "success");
+            } else {
+                showToast("キーコードが正しくありません。", "error");
+                document.getElementById('teacherUnlockPw').value = "";
+                document.getElementById('teacherUnlockPw').focus();
+            }
+        }
+
+        function closeTeacherUnlockModal() {
+            document.getElementById('teacherUnlockModal').classList.add('hidden');
+        }
+
+        function switchToTeacherView() {
+            document.getElementById('studentView').classList.add('hidden');
+            document.getElementById('teacherView').classList.remove('hidden');
+            document.getElementById('tabStudent').className = "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 text-slate-500 hover:text-slate-900";
+            document.getElementById('tabTeacher').className = "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 bg-white text-slate-900 shadow-sm";
+            renderDashboardStats();
+            renderNotesTable();
+            renderHeatmap();
+        }
+
+        function handleFileSelected() {
+            const fileInput = document.getElementById('attachmentInput');
+            const label = document.getElementById('fileInfoLabel');
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                const sizeKb = Math.round(file.size / 1024);
+                currentAttachedFileData = {
+                    name: file.name,
+                    size: sizeKb > 1024 ? (sizeKb / 1024).toFixed(1) + " MB" : sizeKb + " KB"
+                };
+                label.innerText = `(${currentAttachedFileData.size})`;
+                label.classList.remove('hidden');
+                showToast(`📎 ファイル選択: ${file.name}`);
+            } else {
+                currentAttachedFileData = null;
+                label.classList.add('hidden');
+            }
+            saveDraft();
+        }
+
+        function switchEditorPage(pageIdx) {
+            pagesData[activePageIdx].cues = document.getElementById('cuesArea').value;
+            pagesData[activePageIdx].body = document.getElementById('bodyArea').value;
+            globalSummary = document.getElementById('summaryArea').value;
+
+            activePageIdx = pageIdx;
+            document.getElementById('cuesArea').value = pagesData[activePageIdx].cues || "";
+            document.getElementById('bodyArea').value = pagesData[activePageIdx].body || "";
+            document.getElementById('summaryArea').value = globalSummary;
+
+            for (let i = 0; i < 5; i++) {
+                document.getElementById(`btnPage${i}`).className = (i === pageIdx) ? 
+                    "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-900 shadow-sm transition-all border border-slate-300/60" : 
+                    "px-3 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-900 transition-all";
+            }
+            document.getElementById('pageBadge').innerText = `${activePageIdx + 1} / 5 ページ目を編集中`;
+            if (isRecallModeActive) {
+                document.getElementById('cuesArea').classList.add('recall-blurred');
+                document.getElementById('cuesArea').classList.remove('recall-revealed');
+            }
+            updateCharCount();
+        }
+
+        function handleStudentIdInput() {
+            const studentId = document.getElementById('studentIdInput').value.trim();
+            if (!studentId) {
+                document.getElementById('portfolioPlaceholder').classList.remove('hidden');
+                document.getElementById('portfolioContent').classList.add('hidden');
+                document.getElementById('studentPortfolioBadge').innerText = "履歴: 未検索";
+                return;
+            }
+            const matchNotes = notesDatabase.filter(n => n.studentId.trim().toLowerCase() === studentId.toLowerCase());
+            document.getElementById('portfolioPlaceholder').classList.add('hidden');
+            document.getElementById('portfolioContent').classList.remove('hidden');
+            document.getElementById('studentPortfolioBadge').innerText = `提出件数: ${matchNotes.length} 件`;
+            document.getElementById('portfolioCount').innerText = `${matchNotes.length} 回`;
+            
+            let totalChars = 0;
+            matchNotes.forEach(n => n.pages.forEach(p => { totalChars += (p.body || "").length; }));
+            document.getElementById('portfolioChars').innerText = `${totalChars} 字`;
+            document.getElementById('portfolioLastDate').innerText = matchNotes.length > 0 ? matchNotes[0].timestamp : "-";
+
+            const cardList = document.getElementById('portfolioCardList');
+            cardList.innerHTML = matchNotes.length === 0 ? `<p class="text-xs text-slate-400 py-4 col-span-2">提出されたノート履歴がまだありません。</p>` : "";
+
+            matchNotes.forEach((n) => {
+                const totalPagesWritten = n.pages.filter(p => (p.body || "").trim().length > 0).length;
+                const card = document.createElement('div');
+                card.className = "bg-slate-50/50 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between hover:bg-slate-50 transition-all shadow-sm";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[9px] bg-blue-100 text-blue-700 font-extrabold px-2 py-0.5 rounded">${n.timestamp.split(' ')[0]} 提出</span>
+                            <div class="flex items-center gap-1">
+                                ${n.attachment ? `<span class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded font-medium"><i class="fa-solid fa-paperclip"></i> 資料あり</span>` : ""}
+                                <span class="text-[10px] text-slate-400 font-bold"><i class="fa-solid fa-copy"></i> ${totalPagesWritten || 1}/5 ページ</span>
+                            </div>
+                        </div>
+                        <h5 class="text-xs font-bold text-slate-800 line-clamp-1 mb-1">${n.topic || "無題のトピック"}</h5>
+                        <p class="text-[10px] text-slate-400 font-semibold italic line-clamp-1">要約: ${n.summary ? n.summary.substring(0, 30) : "未記述"}</p>
+                    </div>
+                    <button onclick="viewNoteDetails('${n.id}')" class="mt-4 bg-white text-slate-700 border border-slate-200 font-bold text-[9px] px-3 py-1.5 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-all self-end">プレビュー</button>
+                `;
+                cardList.appendChild(card);
+            });
+        }
+
+        function renderDashboardStats() {
+            document.getElementById('statTotalCount').innerText = notesDatabase.length;
+            document.getElementById('statUniqueUsers').innerText = new Set(notesDatabase.map(n => n.studentId.trim())).size;
+            if (notesDatabase.length > 0) {
+                let totalChars = 0;
+                notesDatabase.forEach(n => n.pages.forEach(p => { totalChars += (p.body || "").length; }));
+                document.getElementById('statAvgChars').innerText = Math.round(totalChars / notesDatabase.length);
+            } else {
+                document.getElementById('statAvgChars').innerText = 0;
+            }
+            updateTeacherBadge();
+        }
+
+        function renderHeatmap() {
+            const grid = document.getElementById('heatmapGrid');
+            grid.innerHTML = "";
+            const today = new Date();
+            const dateMap = {};
+            notesDatabase.forEach(n => { if (n.timestamp) dateMap[n.timestamp.split(' ')[0]] = (dateMap[n.timestamp.split(' ')[0]] || 0) + 1; });
+
+            for (let i = 29; i >= 0; i--) {
+                const targetDate = new Date(today); targetDate.setDate(today.getDate() - i);
+                const formatKey = `${targetDate.getFullYear()}/${String(targetDate.getMonth() + 1).padStart(2, '0')}/${String(targetDate.getDate()).padStart(2, '0')}`;
+                const count = dateMap[formatKey] || 0;
+                let colorClass = "bg-slate-200 text-slate-400";
+                if (count > 0 && count <= 2) colorClass = "bg-emerald-100 text-emerald-800 border border-emerald-200";
+                else if (count > 2 && count <= 5) colorClass = "bg-emerald-300 text-emerald-900";
+                else if (count > 5) colorClass = "bg-emerald-600 text-white font-bold";
+
+                const cell = document.createElement('div');
+                cell.className = `heatmap-cell w-8 h-8 rounded-lg flex items-center justify-center text-[9px] shadow-sm cursor-pointer ${colorClass}`;
+                cell.setAttribute('title', `${formatKey} : 提出 ${count} 件`);
+                cell.innerText = String(targetDate.getDate()).padStart(2, '0');
+                grid.appendChild(cell);
+            }
+        }
+
+        function updateTeacherBadge() { document.getElementById('badgeCount').innerText = notesDatabase.length; }
+
+        function renderNotesTable() {
+            const tBody = document.getElementById('tableBody');
+            const query = document.getElementById('searchBar').value.trim().toLowerCase();
+            tBody.innerHTML = "";
+            const filtered = notesDatabase.filter(n => (n.studentName || "").toLowerCase().includes(query) || (n.studentId || "").toLowerCase().includes(query) || (n.topic || "").toLowerCase().includes(query));
+
+            if (filtered.length === 0) {
+                tBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">提出ログが見つかりませんでした。</td></tr>`;
+                return;
+            }
+            filtered.forEach(n => {
+                let totalChars = 0; n.pages.forEach(p => { totalChars += (p.body || "").length; });
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 pl-6 text-slate-400 font-mono text-[11px]">${n.timestamp}</td>
+                    <td class="p-4 font-mono font-bold text-blue-600">${n.studentId}</td>
+                    <td class="p-4 font-bold text-slate-800">${n.studentName}</td>
+                    <td class="p-4 font-medium text-slate-700 max-w-xs truncate" title="${n.topic}">${n.topic || "未設定"}</td>
+                    <td class="p-4 text-center">${n.attachment ? `<span class="inline-flex items-center gap-1 text-[10px] bg-slate-100 text-slate-700 px-2 py-1 rounded-md border border-slate-200"><i class="fa-solid fa-paperclip text-blue-500"></i> ${n.attachment.name}</span>` : `<span class="text-slate-300">-</span>`}</td>
+                    <td class="p-4 text-center text-slate-500 font-mono text-[11px]">${totalChars}字</td>
+                    <td class="p-4 text-right pr-6"><button onclick="viewNoteDetails('${n.id}')" class="bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-bold text-[10px] px-3.5 py-2 rounded-xl transition-all">詳細プレビュー</button></td>
+                `;
+                tBody.appendChild(tr);
+            });
+        }
+
+        function viewNoteDetails(noteId) {
+            selectedNoteForModal = notesDatabase.find(n => n.id === noteId);
+            if (!selectedNoteForModal) return;
+            document.getElementById('viewModalTopic').innerText = selectedNoteForModal.topic || "無題のトピック";
+            document.getElementById('viewModalMeta').innerText = `学籍番号: ${selectedNoteForModal.studentId}  |  氏名: ${selectedNoteForModal.studentName}  |  提出日: ${selectedNoteForModal.timestamp}`;
+            if (selectedNoteForModal.attachment) {
+                document.getElementById('viewModalAttachmentName').innerText = `${selectedNoteForModal.attachment.name} (${selectedNoteForModal.attachment.size})`;
+                document.getElementById('viewModalAttachmentRow').classList.remove('hidden');
+            } else {
+                document.getElementById('viewModalAttachmentRow').classList.add('hidden');
+            }
+            switchViewerModalPage(0);
+            document.getElementById('noteViewerModal').classList.remove('hidden');
+        }
+
+        function switchViewerModalPage(pageIdx) {
+            if (!selectedNoteForModal) return;
+            modalActivePageIdx = pageIdx;
+            const page = selectedNoteForModal.pages[pageIdx] || { cues: "", body: "" };
+            document.getElementById('viewModalCues').innerText = page.cues || "(このページは未記入です)";
+            document.getElementById('viewModalBody').innerText = page.body || "(このページは未記入です)";
+            document.getElementById('viewModalSummary').innerText = selectedNoteForModal.summary || "(未記述)";
+            for (let i = 0; i < 5; i++) {
+                document.getElementById(`modalPageTab${i}`).className = (i === pageIdx) ? "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-900 text-white shadow-sm" : "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-900";
+            }
+        }
+
+        function closeNoteViewerModal() { document.getElementById('noteViewerModal').classList.add('hidden'); }
+
+        function saveDraft() {
+            if (draftTimer) clearTimeout(draftTimer);
+            pagesData[activePageIdx].cues = document.getElementById('cuesArea').value;
+            pagesData[activePageIdx].body = document.getElementById('bodyArea').value;
+            globalSummary = document.getElementById('summaryArea').value;
+
+            draftTimer = setTimeout(() => {
+                const draft = {
+                    topic: document.getElementById('topicInput').value.trim(),
+                    studentId: document.getElementById('studentIdInput').value.trim(),
+                    studentName: document.getElementById('studentNameInput').value.trim(),
+                    summary: globalSummary, pages: pagesData, attachment: currentAttachedFileData
+                };
+                localStorage.setItem('cornell_notes_draft_v5', JSON.stringify(draft));
+                document.getElementById('draftStatus').classList.remove('hidden');
+                setTimeout(() => document.getElementById('draftStatus').classList.add('hidden'), 1500);
+            }, 800);
+        }
+
+        function loadDraft() {
+            const raw = localStorage.getItem('cornell_notes_draft_v5');
+            if (!raw) return;
+            try {
+                const draft = JSON.parse(raw);
+                document.getElementById('topicInput').value = draft.topic || "";
+                document.getElementById('studentIdInput').value = draft.studentId || "";
+                document.getElementById('studentNameInput').value = draft.studentName || "";
+                globalSummary = draft.summary || "";
+                document.getElementById('summaryArea').value = globalSummary;
+                if (draft.pages && draft.pages.length === 5) {
+                    pagesData = draft.pages;
+                    document.getElementById('cuesArea').value = pagesData[0].cues || "";
+                    document.getElementById('bodyArea').value = pagesData[0].body || "";
+                }
+                if (draft.attachment) {
+                    currentAttachedFileData = draft.attachment;
+                    document.getElementById('fileInfoLabel').innerText = `(${currentAttachedFileData.size})`;
+                    document.getElementById('fileInfoLabel').classList.remove('hidden');
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        function updateCharCount() {
+            document.getElementById('charCountLabel').innerText = `文字数: ${document.getElementById('bodyArea').value.length}字`;
+            updateTotalCharCount();
+        }
+
+        function updateTotalCharCount() {
+            pagesData[activePageIdx].body = document.getElementById('bodyArea').value;
+            let total = 0; pagesData.forEach(p => { total += (p.body || "").length; });
+            document.getElementById('totalCharCountLabel').innerText = `全ページ総文字数: ${total}字`;
+        }
+
+        function handleNoteSubmit() {
+            pagesData[activePageIdx].cues = document.getElementById('cuesArea').value;
+            pagesData[activePageIdx].body = document.getElementById('bodyArea').value;
+            globalSummary = document.getElementById('summaryArea').value;
+
+            const topic = document.getElementById('topicInput').value.trim();
+            const sId = document.getElementById('studentIdInput').value.trim();
+            const sName = document.getElementById('studentNameInput').value.trim();
+
+            if (!topic || !sId || !sName) { showToast("⚠️ 講義テーマ、学籍番号、氏名は必須入力項目です。", "error"); return; }
+            if (!pagesData.some(p => (p.body||"").trim().length > 0 || (p.cues||"").trim().length > 0) && !globalSummary.trim().length > 0 && !currentAttachedFileData) { showToast("⚠️ データが存在しません。", "error"); return; }
+
+            const now = new Date();
+            const timestampStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+            
+            notesDatabase.unshift({
+                id: "note_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+                timestamp: timestampStr, dateStr: `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`,
+                topic: topic, studentId: sId, studentName: sName, summary: globalSummary, attachment: currentAttachedFileData, pages: JSON.parse(JSON.stringify(pagesData))
+            });
+
+            localStorage.setItem('cornell_notes_db_26sla_v5', JSON.stringify(notesDatabase));
+            localStorage.removeItem('cornell_notes_draft_v5');
+            currentAttachedFileData = null;
+            document.getElementById('attachmentInput').value = "";
+            document.getElementById('fileInfoLabel').classList.add('hidden');
+            showToast("🎉 ノートを無事に提出しました！", "success");
+            
+            pagesData = [{ cues: "", body: "" }, { cues: "", body: "" }, { cues: "", body: "" }, { cues: "", body: "" }, { cues: "", body: "" }];
+            globalSummary = ""; document.getElementById('topicInput').value = "";
+            switchEditorPage(0);
+            handleStudentIdInput();
+            updateTeacherBadge();
+        }
+
+        function clearEditor() {
+            document.getElementById('cuesArea').value = ""; document.getElementById('bodyArea').value = "";
+            pagesData[activePageIdx] = { cues: "", body: "" };
+            updateCharCount(); saveDraft();
+            showToast("指定ページの入力をクリアしました。");
+        }
+
+        function toggleActiveRecall() {
+            isRecallModeActive = !isRecallModeActive;
+            if (isRecallModeActive) {
+                document.getElementById('recallToggleBtn').className = "flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md";
+                document.getElementById('recallToggleBtn').querySelector('span').innerText = "暗記目隠し: ON";
+                document.getElementById('cuesArea').classList.add('recall-blurred');
+                showToast("📖 目隠しモードON。クリックで一時開示されます。", "success");
+            } else {
+                document.getElementById('recallToggleBtn').className = "flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition-all";
+                document.getElementById('recallToggleBtn').querySelector('span').innerText = "暗記目隠し: OFF";
+                document.getElementById('cuesArea').classList.remove('recall-blurred', 'recall-revealed');
+            }
+        }
+
+        document.getElementById('cuesArea').addEventListener('click', function() { if (isRecallModeActive) this.classList.toggle('recall-revealed'); });
+
+        function exportToCSV() {
+            if (notesDatabase.length === 0) { showToast("データが存在しません。", "error"); return; }
+            let csv = "\uFEFF"; csv += "提出日時,学籍番号,氏名,講義テーマ,添付ファイル名,添付サイズ,全体要約,P1キーワード,P1本文,P2キーワード,P2本文,P3キーワード,P3本文,P4キーワード,P4本文,P5キーワード,P5本文\r\n";
+            notesDatabase.forEach(n => {
+                const escape = (str) => `"${(str || "").replace(/"/g, '""')}"`;
+                csv += [
+                    escape(n.timestamp), escape(n.studentId), escape(n.studentName), escape(n.topic), escape(n.attachment?.name || ""), escape(n.attachment?.size || ""), escape(n.summary),
+                    escape(n.pages[0]?.cues), escape(n.pages[0]?.body), escape(n.pages[1]?.cues), escape(n.pages[1]?.body),
+                    escape(n.pages[2]?.cues), escape(n.pages[2]?.body), escape(n.pages[3]?.cues), escape(n.pages[3]?.body),
+                    escape(n.pages[4]?.cues), escape(n.pages[4]?.body)
+                ].join(",") + "\r\n";
+            });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+            link.setAttribute("download", `SLA_Seminar_Notes_5Pages_${Date.now()}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast("📥 CSVデータを書き出しました。", "success");
+        }
+
+        function exportToJSON() {
+            if (notesDatabase.length === 0) { showToast("データが存在しません。", "error"); return; }
+            const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([JSON.stringify(notesDatabase, null, 2)], { type: 'application/json;charset=utf-8;' }));
+            link.setAttribute("download", `SLA_Seminar_Notes_5Pages_${Date.now()}.json`); document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast("📥 JSONデータを書き出しました。", "success");
+        }
+
+        function triggerResetDatabase() {
+            if (confirm("⚠️ クラスのすべてのログデータ・保存された下書きを初期化しますか？")) {
+                notesDatabase = sampleNotes; localStorage.setItem('cornell_notes_db_26sla_v5', JSON.stringify(notesDatabase));
+                localStorage.removeItem('cornell_notes_draft_v5');
+                renderDashboardStats(); renderNotesTable(); renderHeatmap(); handleStudentIdInput();
+                showToast("データベースを初期化しました。");
+            }
+        }
+
+        function showToast(message, type = "success") {
+            const toastEl = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = message;
+            document.getElementById('toastIcon').className = type === "success" ? "fa-solid fa-circle-check text-emerald-500 text-sm" : type === "error" ? "fa-solid fa-circle-exclamation text-rose-500 text-sm" : "fa-solid fa-bell text-blue-500 text-sm";
+            toastEl.classList.remove('translate-y-20', 'opacity-0'); toastEl.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => { toastEl.classList.remove('translate-y-0', 'opacity-100'); toastEl.classList.add('translate-y-20', 'opacity-0'); }, 3000);
+        }
+    </script>
+</body>
+</html>
