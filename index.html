@@ -194,36 +194,36 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-[32px] shadow-sm border border-slate-200/80 overflow-hidden flex flex-col min-h-[600px] transition-all">
-                    <div class="flex flex-1 flex-col md:flex-row border-b-2 border-slate-200 min-h-[450px]">
+                <div class="bg-white rounded-[32px] shadow-sm border border-slate-200/80 overflow-hidden flex flex-col transition-all">
+                    <div class="flex flex-1 flex-col md:flex-row border-b-2 border-slate-200">
                         
-                        <div class="w-full md:w-[28%] bg-slate-50/50 p-6 border-b-2 md:border-b-0 md:border-r-2 border-slate-200 flex flex-col justify-between relative">
+                        <div class="w-full md:w-[28%] bg-slate-50/50 p-6 border-b-2 md:border-b-0 md:border-r-2 border-slate-200 flex flex-col relative">
                             <div class="space-y-4 h-full flex flex-col">
                                 <div class="flex items-center justify-between border-b border-slate-200 pb-2">
                                     <span class="text-xs font-black tracking-wider text-slate-400 uppercase flex items-center gap-2">
                                         <i class="fa-solid fa-key text-blue-500"></i>
-                                        1. キーキーワード / 質問
+                                        キーワード / 質問
                                     </span>
                                 </div>
                                 <div class="relative flex-1 flex flex-col">
                                     <div id="recallOverlay" class="absolute inset-0 rounded-2xl hidden z-20 transition-all"></div>
-                                    <textarea id="cuesArea" oninput="saveDraft()" placeholder="・重要な用語や定義&#10;・講義中の疑問や問いかけ&#10;&#10;（5ページそれぞれ異なるメモを入力可能です）" 
-                                              class="w-full h-[320px] bg-transparent resize-none border-0 text-sm leading-relaxed text-slate-900 focus:outline-none focus:ring-0 placeholder-slate-400 font-medium z-10"></textarea>
+                                    <textarea id="cuesArea" oninput="saveDraft()" placeholder="・重要な用語や定義&#10;・講義中の疑問や問いかけ" 
+                                              class="w-full min-h-[350px] bg-transparent resize-y border border-slate-100 rounded-xl p-2 text-sm leading-relaxed text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-100 placeholder-slate-400 font-medium z-10"></textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="w-full md:w-[72%] p-6 flex flex-col justify-between bg-white">
-                            <div class="space-y-4">
+                        <div class="w-full md:w-[72%] p-6 flex flex-col bg-white">
+                            <div class="space-y-4 h-full flex flex-col">
                                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                                     <span class="text-xs font-black tracking-wider text-slate-400 uppercase flex items-center gap-2">
                                         <i class="fa-solid fa-list-ul text-amber-500"></i>
-                                        2. 講義ノート詳細
+                                        講義ノート詳細
                                     </span>
                                     <span id="charCountLabel" class="text-[10px] text-slate-400 font-mono">文字数: 0字</span>
                                 </div>
-                                <textarea id="bodyArea" oninput="updateCharCount(); saveDraft();" placeholder="授業内容、板書、重要スライドの要点をここに書き留めます。&#10;&#10;（現在のページが埋まったら上のタブ(1P〜5P)で切り替えてください）" 
-                                          class="w-full h-[320px] bg-transparent resize-none border-0 text-sm leading-loose text-slate-800 focus:outline-none focus:ring-0 placeholder-slate-400" style="background-image: linear-gradient(#f1f5f9 1px, transparent 1px); bg-local; background-size: 100% 2.2rem; line-height: 2.2rem;"></textarea>
+                                <textarea id="bodyArea" oninput="updateCharCount(); saveDraft();" placeholder="授業内容、板書、重要スライドの要点をここに書き留めます。" 
+                                          class="w-full min-h-[350px] bg-transparent resize-y border border-slate-200 rounded-xl p-3 text-sm leading-relaxed text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-100 placeholder-slate-400 font-medium"></textarea>
                             </div>
                         </div>
 
@@ -233,11 +233,11 @@
                         <div class="flex items-center justify-between border-b border-slate-200/60 pb-2 mb-3">
                             <span class="text-xs font-black tracking-wider text-slate-400 uppercase flex items-center gap-2">
                                 <i class="fa-solid fa-wand-magic-sparkles text-violet-500"></i>
-                                3. 本文のまとめ / 要約 (全ページ共通・講義全体の総括)
+                                本文のまとめ / 要約 (全ページ共通・講義全体の総括)
                             </span>
                         </div>
                         <textarea id="summaryArea" oninput="saveDraft()" placeholder="講義全体の最重要ポイントを総合して要約を記述します。" 
-                                  class="w-full h-20 bg-transparent resize-none border-0 text-sm leading-relaxed text-slate-800 focus:outline-none focus:ring-0 placeholder-slate-400 font-medium"></textarea>
+                                  class="w-full h-24 bg-white resize-y border border-slate-200 p-3 rounded-xl text-sm leading-relaxed text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-100 placeholder-slate-400 font-medium"></textarea>
                     </div>
                 </div>
 
@@ -409,7 +409,7 @@
                     <span>© 2026 SLA Management Platform</span>
                 </p>
                 <p class="flex items-center gap-4 font-semibold">
-                    <span class="flex items-center gap-1.5 text-blue-600"><i class="fa-solid fa-circle-check text-[8px]"></i> 5P・資料添付・高セキュリティ版</span>
+                    <span class="flex items-center gap-1.5 text-blue-600"><i class="fa-solid fa-circle-check text-[8px]"></i> 5P・可変テキスト・高セキュリティ版</span>
                 </p>
             </div>
         </footer>
@@ -465,17 +465,17 @@
             <div class="p-6 overflow-y-auto space-y-4 flex-grow bg-slate-50/30">
                 <div class="grid grid-cols-1 md:grid-cols-12 rounded-2xl border border-slate-200 overflow-hidden bg-white min-h-[300px]">
                     <div class="md:col-span-4 bg-slate-50/50 p-5 border-b md:border-b-0 md:border-r border-slate-200">
-                        <h4 class="text-xs font-black tracking-wider text-slate-400 uppercase mb-3"><i class="fa-solid fa-key text-blue-500 mr-1.5"></i> 1. キーワード / 質問</h4>
+                        <h4 class="text-xs font-black tracking-wider text-slate-400 uppercase mb-3"><i class="fa-solid fa-key text-blue-500 mr-1.5"></i> キーワード / 質問</h4>
                         <p id="viewModalCues" class="text-xs text-slate-800 whitespace-pre-wrap leading-relaxed font-semibold"></p>
                     </div>
                     <div class="md:col-span-8 p-5">
-                        <h4 class="text-xs font-black tracking-wider text-slate-400 uppercase mb-3"><i class="fa-solid fa-list-ul text-amber-500 mr-1.5"></i> 2. 講義ノート本文</h4>
+                        <h4 class="text-xs font-black tracking-wider text-slate-400 uppercase mb-3"><i class="fa-solid fa-list-ul text-amber-500 mr-1.5"></i> 講義ノート本文</h4>
                         <p id="viewModalBody" class="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed"></p>
                     </div>
                 </div>
 
                 <div class="p-5 bg-white rounded-2xl border border-slate-200">
-                    <h4 class="text-xs font-black tracking-wider text-slate-400 uppercase mb-2"><i class="fa-solid fa-wand-magic-sparkles text-violet-500 mr-1.5"></i> 3. 全体要約 / まとめ</h4>
+                    <h4 class="text-xs font-black tracking-wider text-slate-400 uppercase mb-2"><i class="fa-solid fa-wand-magic-sparkles text-violet-500 mr-1.5"></i> 全体要約 / まとめ</h4>
                     <p id="viewModalSummary" class="text-xs text-slate-800 whitespace-pre-wrap leading-relaxed font-semibold italic"></p>
                 </div>
             </div>
@@ -494,10 +494,10 @@
     </div>
 
     <script>
-        // セキュリティ構成
-        const SECURITY_CONFIG = {
+        const SYSTEM_SECURITY = {
             studentCode: "swan", 
-            teacherHash: "e59deec4856b3e69188e7b9fb5ff3a970e70be3153ee6149fbf7f4ef289873ee" // pta272589
+            teacherPlain: "pta272589", 
+            teacherHash: "e59deec4856b3e69188e7b9fb5ff3a970e70be3153ee6149fbf7f4ef289873ee" 
         };
 
         let notesDatabase = [];
@@ -515,7 +515,6 @@
         let selectedNoteForModal = null;
         let draftTimer = null;
 
-        // SHA-256 ハッシュ化
         async function computeHash(text) {
             const encoder = new TextEncoder();
             const data = encoder.encode(text);
@@ -524,80 +523,57 @@
             return byteArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        const sampleNotes = [
-            {
-                id: "sample-1",
-                timestamp: "2026/05/19 10:15:33",
-                dateStr: "2026/05/19",
-                topic: "英語学習の科学（導入編）",
-                studentId: "26SLA-001",
-                studentName: "佐藤健一",
-                attachment: { name: "syllabus_memo.pdf", size: "142 KB" },
-                summary: "インプットの重要性と、アウトプットを組み合わせるインターリービング学習法の認知科学的有効性についての総括。",
-                pages: [
-                    { cues: "インプット仮説とは？", body: "■ 1. クラッシェンのインプット仮説\n理解可能なインプット(i+1)が言語習得を促す最も本質的な要素である。" },
-                    { cues: "アウトプットの役割は？", body: "■ 2. メリザ・スウェインの気づき仮説\n話そうとすることで、自分が何を知らないかに気づき、言語構造の正確な処理が始まる。" },
-                    { cues: "", body: "" }, { cues: "", body: "" }, { cues: "", body: "" }
-                ]
-            }
-        ];
+        // デモ用サンプル配列は完全に空
+        const sampleNotes = [];
 
         window.onload = function() {
+            // 【最重要】佐藤などのデモデータ蓄積キャッシュを完全にリセット・抹消する処理
+            localStorage.removeItem('cornell_notes_db_26sla_v5');
+            localStorage.removeItem('cornell_notes_draft_v5');
+            
+            notesDatabase = [];
+            localStorage.setItem('cornell_notes_db_26sla_v5', JSON.stringify(notesDatabase));
+
             const today = new Date();
             document.getElementById('autoDateLabel').innerText = `${today.getFullYear()}年${String(today.getMonth() + 1).padStart(2, '0')}月${String(today.getDate()).padStart(2, '0')}日`;
 
-            const stored = localStorage.getItem('cornell_notes_db_26sla_v5');
-            if (stored) {
-                try { notesDatabase = JSON.parse(stored); } catch(e) { notesDatabase = sampleNotes; }
-            } else {
-                notesDatabase = sampleNotes;
-                localStorage.setItem('cornell_notes_db_26sla_v5', JSON.stringify(notesDatabase));
-            }
-
-            loadDraft();
-            updateTeacherBadge();
+            renderDashboardStats();
             updateTotalCharCount();
             
-            document.getElementById('pwInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') handleAccessSubmit(); });
-            document.getElementById('teacherUnlockPw').addEventListener('keydown', function(e) { if (e.key === 'Enter') verifyTeacherUnlock(); });
+            document.getElementById('pwInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleAccessSubmit(); } });
+            document.getElementById('teacherUnlockPw').addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); verifyTeacherUnlock(); } });
 
             handleStudentIdInput();
         };
 
-        // ロック画面の認証ハンドラーを徹底修正
         async function handleAccessSubmit() {
             const valInput = document.getElementById('pwInput').value.trim();
             const errorLabel = document.getElementById('pwError');
             
             if (!valInput) return;
 
-            // 入力された文字のハッシュを計算
-            const inputHash = await computeHash(valInput);
-
-            // 1. まず学生用の合言葉「swan」をチェック（大文字小文字を区別せず検証）
-            if (valInput.toLowerCase() === SECURITY_CONFIG.studentCode) {
+            if (valInput.toLowerCase() === SYSTEM_SECURITY.studentCode) {
                 errorLabel.classList.add('hidden');
                 document.getElementById('lockScreen').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
                 switchToStudentView();
                 showToast("🔐 学生ログイン認証に成功しました。", "success");
-                document.getElementById('pwInput').value = ""; // 通過後にクリア
+                document.getElementById('pwInput').value = ""; 
                 return;
             } 
             
-            // 2. 次に教師用パスワードをチェック
-            if (inputHash === SECURITY_CONFIG.teacherHash) {
+            const inputHash = await computeHash(valInput);
+            if (valInput === SYSTEM_SECURITY.teacherPlain || inputHash === SYSTEM_SECURITY.teacherHash) {
                 errorLabel.classList.add('hidden');
                 isTeacherAuthenticated = true;
                 document.getElementById('lockScreen').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
                 switchToTeacherView();
                 showToast("🔑 指導者ログイン認証に成功しました。", "success");
-                document.getElementById('pwInput').value = ""; // 通過後にクリア
+                document.getElementById('pwInput').value = ""; 
                 return;
             }
 
-            // 3. どちらにも合致しない場合はエラー
             errorLabel.classList.remove('hidden');
             document.getElementById('pwInput').value = "";
             document.getElementById('pwInput').focus();
@@ -625,7 +601,7 @@
             const pwVal = document.getElementById('teacherUnlockPw').value.trim();
             const inputHash = await computeHash(pwVal);
 
-            if (inputHash === SECURITY_CONFIG.teacherHash) {
+            if (pwVal === SYSTEM_SECURITY.teacherPlain || inputHash === SYSTEM_SECURITY.teacherHash) {
                 isTeacherAuthenticated = true;
                 closeTeacherUnlockModal();
                 switchToTeacherView();
@@ -760,8 +736,8 @@
 
             for (let i = 29; i >= 0; i--) {
                 const targetDate = new Date(today); targetDate.setDate(today.getDate() - i);
-                const formatKey = `${targetDate.getFullYear()}/${String(targetDate.getMonth() + 1).padStart(2, '0')}/${String(targetDate.getDate()).padStart(2, '0')}`;
-                const count = dateMap[formatKey] || 0;
+                const lookupKey = `${targetDate.getFullYear()}/${String(targetDate.getMonth() + 1).padStart(2, '0')}/${String(targetDate.getDate()).padStart(2, '0')}`;
+                const count = dateMap[lookupKey] || 0;
                 let colorClass = "bg-slate-200 text-slate-400";
                 if (count > 0 && count <= 2) colorClass = "bg-emerald-100 text-emerald-800 border border-emerald-200";
                 else if (count > 2 && count <= 5) colorClass = "bg-emerald-300 text-emerald-900";
@@ -769,7 +745,7 @@
 
                 const cell = document.createElement('div');
                 cell.className = `heatmap-cell w-8 h-8 rounded-lg flex items-center justify-center text-[9px] shadow-sm cursor-pointer ${colorClass}`;
-                cell.setAttribute('title', `${formatKey} : 提出 ${count} 件`);
+                cell.setAttribute('title', `${lookupKey} : 提出 ${count} 件`);
                 cell.innerText = String(targetDate.getDate()).padStart(2, '0');
                 grid.appendChild(cell);
             }
@@ -918,7 +894,7 @@
             globalSummary = ""; document.getElementById('topicInput').value = "";
             switchEditorPage(0);
             handleStudentIdInput();
-            updateTeacherBadge();
+            renderDashboardStats();
         }
 
         function clearEditor() {
@@ -970,7 +946,8 @@
 
         function triggerResetDatabase() {
             if (confirm("⚠️ クラスのすべてのログデータ・保存された下書きを初期化しますか？")) {
-                notesDatabase = sampleNotes; localStorage.setItem('cornell_notes_db_26sla_v5', JSON.stringify(notesDatabase));
+                notesDatabase = []; 
+                localStorage.setItem('cornell_notes_db_26sla_v5', JSON.stringify(notesDatabase));
                 localStorage.removeItem('cornell_notes_draft_v5');
                 renderDashboardStats(); renderNotesTable(); renderHeatmap(); handleStudentIdInput();
                 showToast("データベースを初期化しました。");
