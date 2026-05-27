@@ -18,7 +18,7 @@
         .serif-title {
             font-family: 'Playfair Display', 'Noto Sans JP', serif;
         }
-        /* 暗記目隠しモードのエフェクト */
+        /* 暗記目隠しモードのエフェクト（本文領域に適用） */
         .recall-blurred {
             filter: blur(10px);
             background-color: rgba(241, 245, 249, 0.95);
@@ -205,15 +205,12 @@
                                         キーワード / 質問
                                     </span>
                                 </div>
-                                <div class="relative flex-1 flex flex-col">
-                                    <div id="recallOverlay" class="absolute inset-0 rounded-2xl hidden z-20 transition-all"></div>
-                                    <textarea id="cuesArea" oninput="saveDraft()" placeholder="・重要な用語や定義&#10;・講義中の疑問や問いかけ" 
-                                              class="w-full min-h-[350px] bg-transparent resize-y border border-slate-100 rounded-xl p-2 text-sm leading-relaxed text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-100 placeholder-slate-400 font-medium z-10"></textarea>
-                                </div>
+                                <textarea id="cuesArea" oninput="saveDraft()" placeholder="・重要な用語や定義&#10;・講義中の疑問や問いかけ" 
+                                          class="w-full min-h-[350px] bg-transparent resize-y border border-slate-100 rounded-xl p-2 text-sm leading-relaxed text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-100 placeholder-slate-400 font-medium"></textarea>
                             </div>
                         </div>
 
-                        <div class="w-full md:w-[72%] p-6 flex flex-col bg-white">
+                        <div class="w-full md:w-[72%] p-6 flex flex-col bg-white relative">
                             <div class="space-y-4 h-full flex flex-col">
                                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                                     <span class="text-xs font-black tracking-wider text-slate-400 uppercase flex items-center gap-2">
@@ -222,8 +219,10 @@
                                     </span>
                                     <span id="charCountLabel" class="text-[10px] text-slate-400 font-mono">文字数: 0字</span>
                                 </div>
-                                <textarea id="bodyArea" oninput="updateCharCount(); saveDraft();" placeholder="授業内容、板書、重要スライドの要点をここに書き留めます。" 
-                                          class="w-full min-h-[350px] bg-transparent resize-y border border-slate-200 rounded-xl p-3 text-sm leading-relaxed text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-100 placeholder-slate-400 font-medium"></textarea>
+                                <div class="relative flex-1 flex flex-col">
+                                    <textarea id="bodyArea" oninput="updateCharCount(); saveDraft();" placeholder="授業内容、板書、重要スライドの要点をここに書き留めます。" 
+                                              class="w-full min-h-[350px] bg-transparent resize-y border border-slate-200 rounded-xl p-3 text-sm leading-relaxed text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-100 placeholder-slate-400 font-medium z-10"></textarea>
+                                </div>
                             </div>
                         </div>
 
@@ -523,19 +522,20 @@
             return byteArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // デモ用サンプル配列は完全に空
-        const sampleNotes = [];
-
         window.onload = function() {
-            // 【最重要】佐藤などのデモデータ蓄積キャッシュを完全にリセット・抹消する処理
-            localStorage.removeItem('cornell_notes_db_26sla_v5');
-            localStorage.removeItem('cornell_notes_draft_v5');
-            
-            notesDatabase = [];
-            localStorage.setItem('cornell_notes_db_26sla_v5', JSON.stringify(notesDatabase));
+            // ローカルデータベースの読み込み（過去の学生データはここから安全に復元されます）
+            const storedDB = localStorage.getItem('cornell_notes_db_26sla_v5');
+            if (storedDB) {
+                try { notesDatabase = JSON.parse(storedDB); } catch(e) { notesDatabase = []; }
+            } else {
+                notesDatabase = [];
+            }
 
             const today = new Date();
             document.getElementById('autoDateLabel').innerText = `${today.getFullYear()}年${String(today.getMonth() + 1).padStart(2, '0')}月${String(today.getDate()).padStart(2, '0')}日`;
+
+            // 下書きがあれば復元
+            loadDraft();
 
             renderDashboardStats();
             updateTotalCharCount();
@@ -663,9 +663,13 @@
                     "px-3 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-900 transition-all";
             }
             document.getElementById('pageBadge').innerText = `${activePageIdx + 1} / 5 ページ目を編集中`;
+            
+            // 暗記目隠しモードの適用制御を、キーワード(cuesArea)から本文(bodyArea)へと修正
             if (isRecallModeActive) {
-                document.getElementById('cuesArea').classList.add('recall-blurred');
-                document.getElementById('cuesArea').classList.remove('recall-revealed');
+                document.getElementById('bodyArea').classList.add('recall-blurred');
+                document.getElementById('bodyArea').classList.remove('recall-revealed');
+            } else {
+                document.getElementById('bodyArea').classList.remove('recall-blurred', 'recall-revealed');
             }
             updateCharCount();
         }
@@ -909,16 +913,17 @@
             if (isRecallModeActive) {
                 document.getElementById('recallToggleBtn').className = "flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md";
                 document.getElementById('recallToggleBtn').querySelector('span').innerText = "暗記目隠し: ON";
-                document.getElementById('cuesArea').classList.add('recall-blurred');
-                showToast("📖 目隠しモードON。クリックで一時開示されます。", "success");
+                document.getElementById('bodyArea').classList.add('recall-blurred');
+                showToast("📖 本文の目隠しモードON。クリックで一時開示されます。", "success");
             } else {
                 document.getElementById('recallToggleBtn').className = "flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition-all";
                 document.getElementById('recallToggleBtn').querySelector('span').innerText = "暗記目隠し: OFF";
-                document.getElementById('cuesArea').classList.remove('recall-blurred', 'recall-revealed');
+                document.getElementById('bodyArea').classList.remove('recall-blurred', 'recall-revealed');
             }
         }
 
-        document.getElementById('cuesArea').addEventListener('click', function() { if (isRecallModeActive) this.classList.toggle('recall-revealed'); });
+        // 本文クリック時の目隠し開示処理
+        document.getElementById('bodyArea').addEventListener('click', function() { if (isRecallModeActive) this.classList.toggle('recall-revealed'); });
 
         function exportToCSV() {
             if (notesDatabase.length === 0) { showToast("データが存在しません。", "error"); return; }
